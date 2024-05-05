@@ -87,8 +87,11 @@ export class AlchemyService {
         });
       }
 
+      // Filter out tokens with zero balances
+      const filteredTokenBalances = tokenBalances.filter((token) => token.balance.toFixed(2) !== '0.00');
+
       // Cache the token balances
-      AlchemyService.tokenBalancesCache.set(address, tokenBalances);
+      AlchemyService.tokenBalancesCache.set(address, filteredTokenBalances);
 
       return tokenBalances;
     } catch (err) {
