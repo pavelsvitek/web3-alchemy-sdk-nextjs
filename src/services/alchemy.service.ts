@@ -1,3 +1,4 @@
+import TTLCache from '@isaacs/ttlcache';
 import { Alchemy, TokenBalancesResponseErc20, TokenMetadataResponse } from 'alchemy-sdk';
 
 export class AlchemyServiceError extends Error {}
@@ -11,6 +12,11 @@ export type TokenBalanceViewModel = {
 export class AlchemyService {
   private apiKey: string;
   private alchemyClient: Alchemy;
+
+  static tokenMetadataCache: TTLCache<string, TokenMetadataResponse> = new TTLCache({ ttl: 24 * 60 * 60 * 1000 }); // 24 hours
+  static tokenBalancesCache: TTLCache<string, TokenBalanceViewModel[]> = new TTLCache({
+    ttl: 10 * 60 * 1000,
+  }); // 10 minutes
 
   static errors = {
     AlchemyServiceError,
@@ -35,7 +41,15 @@ export class AlchemyService {
 
   async getERC20TokenMetadata(contractAddress: string): Promise<TokenMetadataResponse> {
     try {
+      // Check if the token metadata is cached
+      if (AlchemyService.tokenMetadataCache.has(contractAddress)) {
+        return AlchemyService.tokenMetadataCache.get(contractAddress) as TokenMetadataResponse;
+      }
+
       const metadata = await this.alchemyClient.core.getTokenMetadata(contractAddress);
+
+      // Cache the token metadata
+      AlchemyService.tokenMetadataCache.set(contractAddress, metadata);
 
       return metadata;
     } catch (err) {
@@ -45,13 +59,18 @@ export class AlchemyService {
 
   async getERC721TokenListViewModel(address: string): Promise<TokenBalanceViewModel[]> {
     try {
+      // Check if the token balances are cached
+      if (AlchemyService.tokenBalancesCache.has(address)) {
+        return AlchemyService.tokenBalancesCache.get(address) as TokenBalanceViewModel[];
+      }
+
       const tokenList = await this.getERC20TokenList(address);
       const nonZeroBalances = tokenList.tokenBalances.filter((token) => token.tokenBalance !== '0');
 
       const tokenBalances: TokenBalanceViewModel[] = [];
       for (const token of nonZeroBalances) {
         const metadata = await this.getERC20TokenMetadata(token.contractAddress);
-        if (!metadata.decimals || !metadata.symbol) {
+        if (metadata.decimals === null || !metadata.symbol) {
           console.info(`Token metadata for contract "${token.contractAddress}": ${JSON.stringify(metadata)}`);
           console.error(`Token metadata for contract address ${token.contractAddress} is missing decimals or symbol`);
           continue;
@@ -67,6 +86,9 @@ export class AlchemyService {
           balance,
         });
       }
+
+      // Cache the token balances
+      AlchemyService.tokenBalancesCache.set(address, tokenBalances);
 
       return tokenBalances;
     } catch (err) {
