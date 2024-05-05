@@ -4,6 +4,8 @@ import Head from 'next/head';
 import styles from '../styles/Home.module.css';
 import { getServerSession } from 'next-auth';
 import { getAuthOptions } from './api/auth/[...nextauth]';
+import { useSession } from 'next-auth/react';
+import { useAddressERC20Tokens } from '../models/address/queries';
 
 export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   return {
@@ -14,6 +16,13 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
 };
 
 const Home: NextPage = () => {
+  const session = useSession();
+
+  const isAuthenticated = session && !!session.data?.address;
+  const address = isAuthenticated ? (session.data!.address as string) : '';
+
+  const erc20TokensQuery = useAddressERC20Tokens(address, { enabled: isAuthenticated });
+
   return (
     <div className={styles.container}>
       <Head>
@@ -24,6 +33,29 @@ const Home: NextPage = () => {
 
       <main className={styles.main}>
         <ConnectButton />
+
+        {/* Display list of ERC20 tokens */}
+        {isAuthenticated && (
+          <div>
+            <h2>Your ERC20 Tokens</h2>
+            {/* Display loading state */}
+            {erc20TokensQuery.isLoading && <p>Loading...</p>}
+            {/* Display error state */}
+            {erc20TokensQuery.isFetched && erc20TokensQuery.isError && (
+              <p>Error fetching ERC20 tokens: {erc20TokensQuery.error.message}</p>
+            )}
+            {/* Display success state */}
+            {erc20TokensQuery.isFetched && erc20TokensQuery.isSuccess && (
+              <ul>
+                {erc20TokensQuery.data.map((token: any) => (
+                  <li key={token.symbol}>
+                    {token.name} ({token.symbol}): {token.balance}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        )}
 
         <h1 className={styles.title}>
           Welcome to <a href="">RainbowKit</a> + <a href="">wagmi</a> + <a href="https://nextjs.org">Next.js!</a>
