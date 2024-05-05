@@ -6,6 +6,7 @@ import { getServerSession } from 'next-auth';
 import { getAuthOptions } from './api/auth/[...nextauth]';
 import { useSession } from 'next-auth/react';
 import { useAddressERC20Tokens } from '../models/address/queries';
+import { Skeleton, Typography } from '@mui/material';
 
 export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   return {
@@ -37,9 +38,16 @@ const Home: NextPage = () => {
         {/* Display list of ERC20 tokens */}
         {isAuthenticated && (
           <div>
-            <h2>Your ERC20 Tokens</h2>
+            <Typography variant="h5">Your ERC20 Tokens</Typography>
             {/* Display loading state */}
-            {erc20TokensQuery.isLoading && <p>Loading...</p>}
+            {erc20TokensQuery.isLoading && (
+              <div>
+                <Skeleton variant="text" />
+                <Skeleton variant="text" />
+                <Skeleton variant="text" />
+                <Skeleton variant="text" />
+              </div>
+            )}
             {/* Display error state */}
             {erc20TokensQuery.isFetched && erc20TokensQuery.isError && (
               <p>Error fetching ERC20 tokens: {erc20TokensQuery.error.message}</p>
