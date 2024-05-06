@@ -3,7 +3,7 @@ import type { NextPage } from 'next';
 import Head from 'next/head';
 import styles from '../styles/Home.module.css';
 import { useSession } from 'next-auth/react';
-import { Paper, Skeleton, Table, TableBody, TableCell, TableHead, TableRow, Typography } from '@mui/material';
+import { Button, Paper, Skeleton, Table, TableBody, TableCell, TableHead, TableRow, Typography } from '@mui/material';
 import Nav from '../components/Nav';
 import { useLeaderboard } from '../models/leaderboard/queries';
 
@@ -43,7 +43,15 @@ const Leaderboard: NextPage = () => {
             )}
             {/* Display error state */}
             {leaderboardQuery.isFetched && leaderboardQuery.isError && (
-              <p>Error fetching ERC20 tokens: {leaderboardQuery.error.message}</p>
+              <>
+                <p>There was a problem while loading leaderboard.</p>
+                <Button variant="contained" onClick={() => leaderboardQuery.refetch()}>
+                  Retry
+                </Button>
+                <Typography variant="caption" display="block" gutterBottom mt="1.5rem">
+                  Technical details: {leaderboardQuery.error.message}
+                </Typography>
+              </>
             )}
             {/* Display success state */}
             {leaderboardQuery.isFetched && leaderboardQuery.isSuccess && (

@@ -6,7 +6,7 @@ import { getServerSession } from 'next-auth';
 import { getAuthOptions } from './api/auth/[...nextauth]';
 import { useSession } from 'next-auth/react';
 import { useAddressERC20Tokens } from '../models/address/queries';
-import { Paper, Skeleton, Table, TableBody, TableCell, TableHead, TableRow, Typography } from '@mui/material';
+import { Button, Paper, Skeleton, Table, TableBody, TableCell, TableHead, TableRow, Typography } from '@mui/material';
 import Nav from '../components/Nav';
 
 export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
@@ -55,7 +55,15 @@ const Home: NextPage = () => {
             )}
             {/* Display error state */}
             {erc20TokensQuery.isFetched && erc20TokensQuery.isError && (
-              <p>Error fetching ERC20 tokens: {erc20TokensQuery.error.message}</p>
+              <>
+                <p>There was a problem while loading ERC20 tokens of your wallet.</p>
+                <Button variant="contained" onClick={() => erc20TokensQuery.refetch()}>
+                  Retry
+                </Button>
+                <Typography variant="caption" display="block" gutterBottom mt="1.5rem">
+                  Technical details: {erc20TokensQuery.error.message}
+                </Typography>
+              </>
             )}
             {/* Display success state */}
             {erc20TokensQuery.isFetched && erc20TokensQuery.isSuccess && (
