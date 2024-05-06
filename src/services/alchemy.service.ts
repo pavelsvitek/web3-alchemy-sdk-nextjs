@@ -57,7 +57,7 @@ export class AlchemyService {
     }
   }
 
-  async getERC721TokenListViewModel(address: string): Promise<TokenBalanceViewModel[]> {
+  async getERC20TokenListViewModel(address: string): Promise<TokenBalanceViewModel[]> {
     try {
       // Check if the token balances are cached
       if (AlchemyService.tokenBalancesCache.has(address)) {
