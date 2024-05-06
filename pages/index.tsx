@@ -6,7 +6,7 @@ import { getServerSession } from 'next-auth';
 import { getAuthOptions } from './api/auth/[...nextauth]';
 import { useSession } from 'next-auth/react';
 import { useAddressERC20Tokens } from '../models/address/queries';
-import { Skeleton, Typography } from '@mui/material';
+import { Paper, Skeleton, Table, TableBody, TableCell, TableHead, TableRow, Typography } from '@mui/material';
 
 export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   return {
@@ -37,15 +37,16 @@ const Home: NextPage = () => {
 
         {/* Display list of ERC20 tokens */}
         {isAuthenticated && (
-          <div>
+          <Paper sx={{ padding: '1rem 1.5rem', marginTop: '2rem', minWidth: '700px' }}>
             <Typography variant="h5">Your ERC20 Tokens</Typography>
             {/* Display loading state */}
             {erc20TokensQuery.isLoading && (
               <div>
-                <Skeleton variant="text" />
-                <Skeleton variant="text" />
-                <Skeleton variant="text" />
-                <Skeleton variant="text" />
+                <Skeleton height={52} variant="text" />
+                <Skeleton height={52} variant="text" />
+                <Skeleton height={52} variant="text" />
+                <Skeleton height={52} variant="text" />
+                <Skeleton height={52} variant="text" />
               </div>
             )}
             {/* Display error state */}
@@ -54,15 +55,26 @@ const Home: NextPage = () => {
             )}
             {/* Display success state */}
             {erc20TokensQuery.isFetched && erc20TokensQuery.isSuccess && (
-              <ul>
-                {erc20TokensQuery.data.map((token: any) => (
-                  <li key={token.symbol}>
-                    {token.name} ({token.symbol}): {token.balance}
-                  </li>
-                ))}
-              </ul>
+              <Table sx={{ minWidth: 650 }} aria-label="simple table">
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Token name</TableCell>
+                    <TableCell>Symbol</TableCell>
+                    <TableCell align="right">Balance</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {erc20TokensQuery.data.map((token: any) => (
+                    <TableRow key={token.symbol}>
+                      <TableCell> {token.name} </TableCell>
+                      <TableCell> {token.symbol} </TableCell>
+                      <TableCell align="right"> {token.balance} </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
             )}
-          </div>
+          </Paper>
         )}
       </main>
 
