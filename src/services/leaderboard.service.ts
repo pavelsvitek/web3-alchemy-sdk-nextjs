@@ -17,7 +17,7 @@ export class LeaderboardService {
     this.addEntry('0x9abc', 300);
   }
 
-  async getLeaderboard(): Promise<LeaderboardEntry[]> {
+  getLeaderboard(): LeaderboardEntry[] {
     const entries = [...LeaderboardService.cache.values()];
 
     // Sort the entries by score DESC

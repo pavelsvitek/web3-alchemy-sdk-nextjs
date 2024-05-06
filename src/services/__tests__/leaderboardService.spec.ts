@@ -37,4 +37,53 @@ describe('LeaderboardService()', () => {
       expect(result).toBe(0);
     });
   });
+
+  describe('addEntry()', () => {
+    it('should add an entry to the leaderboard cache', () => {
+      const leaderboardService = new LeaderboardService();
+      const address = '0x1234';
+      const score = 100;
+
+      leaderboardService.addEntry(address, score);
+
+      const entry = LeaderboardService.cache.get(address);
+
+      expect(entry).toEqual({ address, score });
+    });
+  });
+
+  describe('deleteEntry()', () => {
+    it('should delete an entry from the leaderboard cache', () => {
+      const leaderboardService = new LeaderboardService();
+      const address = '0x1234';
+      const score = 100;
+
+      leaderboardService.addEntry(address, score);
+      leaderboardService.deleteEntry(address);
+
+      const entry = LeaderboardService.cache.get(address);
+
+      expect(entry).toBeUndefined();
+    });
+  });
+
+  describe('getLeaderboard()', () => {
+    it('should return the leaderboard entries sorted by score in descending order', () => {
+      const leaderboardService = new LeaderboardService();
+      const cache = LeaderboardService.cache;
+
+      cache.clear();
+      cache.set('0x1234', { address: '0x1234', score: 100 });
+      cache.set('0x5678', { address: '0x5678', score: 200 });
+      cache.set('0x9abc', { address: '0x9abc', score: 300 });
+
+      const entries = leaderboardService.getLeaderboard();
+
+      expect(entries).toEqual([
+        { address: '0x9abc', score: 300 },
+        { address: '0x5678', score: 200 },
+        { address: '0x1234', score: 100 },
+      ]);
+    });
+  });
 });
