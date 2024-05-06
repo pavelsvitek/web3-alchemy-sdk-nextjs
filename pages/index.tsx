@@ -7,6 +7,7 @@ import { getAuthOptions } from './api/auth/[...nextauth]';
 import { useSession } from 'next-auth/react';
 import { useAddressERC20Tokens } from '../models/address/queries';
 import { Paper, Skeleton, Table, TableBody, TableCell, TableHead, TableRow, Typography } from '@mui/material';
+import Nav from '../components/Nav';
 
 export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   return {
@@ -33,6 +34,9 @@ const Home: NextPage = () => {
       </Head>
 
       <main className={styles.main}>
+        {/* Navigation */}
+        {isAuthenticated && <Nav />}
+
         <ConnectButton />
 
         {/* Display list of ERC20 tokens */}
