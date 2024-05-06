@@ -23,7 +23,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
    * An event can be emitted here using pub-sub design principle to update the leaderboard in other place to separate logic.
    */
   const leaderboardService = new LeaderboardService();
-  leaderboardService.addEntry(address, leaderboardService.calculateScore(address, erc20Tokens));
+  leaderboardService.addEntry(address, leaderboardService.calculateScore(erc20Tokens));
 
   return res.json(erc20Tokens);
 }

@@ -39,8 +39,8 @@ export class LeaderboardService {
     LeaderboardService.cache.delete(address);
   }
 
-  calculateScore(address: string, tokens: TokenBalanceViewModel[]): number {
+  calculateScore(tokens: TokenBalanceViewModel[]): number {
     // Random score calculation
-    return Math.floor(tokens.reduce((acc, token) => acc + Math.random() * 1000 + Math.floor(token.balance), 0));
+    return Math.floor(tokens.reduce((acc, token) => acc + Math.floor(token.balance), 0));
   }
 }
