@@ -14,7 +14,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   const alchemyService = new AlchemyService();
-  const erc20Tokens = await alchemyService.getERC721TokenListViewModel(session.address);
+  const erc20Tokens = await alchemyService.getERC20TokenListViewModel(session.address);
 
   return res.json({ address: session.address, erc20Tokens });
 }
